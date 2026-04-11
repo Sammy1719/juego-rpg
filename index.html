@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es"> Sam
+
+<head>
+    <meta charset="UTF-8">
+    <title>Juego Sencillo</title>
+
+    <style>
+        body {
+            background: #111;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+        }
+
+        .escena {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+        }
+
+        .personaje {
+            width: 140px;
+            height: 140px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .atacando {
+            transform: translateX(40px);
+        }
+
+        .golpe {
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            50% {
+                transform: translateX(10px);
+            }
+
+            75% {
+                transform: translateX(-10px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        #log {
+            margin-top: 15px;
+            height: 150px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>⚔️ RPG VISUAL</h1>
+
+    <div class="escena">
+        <div>
+            <div id="jugador" class="personaje">Jugador</div>
+             <span id="vidaJ">100</span>
+        </div>
+
+        <div>
+            <div id="enemigo" class="personaje">Enemigo</div>
+             <span id="vidaE">100</span>
+        </div>
+    </div>
+
+    <br>
+
+    <button onclick="atacar()">Atacar</button>
+    <button onclick="defender()">Defender</button>
+    <button onclick="poder()">Poder</button>
+
+    <div id="log"></div>
+
+    <script>
+
+        // -------- CLASE --------
+        class Personaje {
+            constructor(nombre, vida, ataque) {
+                this.nombre = nombre;
+                this.vida = vida;
+                this.ataque = ataque;
+                this.defensa = false;
+            }
+
+            atacar(enemigo) {
+                let daño = Math.floor(Math.random() * (this.ataque - 5 + 1)) + 5;
+
+                if (enemigo.defensa) {
+                    daño = Math.floor(daño / 2);
+                    enemigo.defensa = false;
+                }
+
+                enemigo.vida -= daño;
+                return daño;
+            }
+
+            defender() {
+                this.defensa = true;
+            }
+        }
+
+        // -------- PEDIR NOMBRES --------
+        let nombreJugador = prompt(" Escribe el nombre de tu personaje:");
+        let nombreEnemigo = prompt(" Escribe el nombre del enemigo:");
+
+        // -------- CREAR PERSONAJES --------
+        let jugador = new Personaje(nombreJugador, 100, 20);
+        let enemigo = new Personaje(nombreEnemigo, 100, 15);
+
+        // Mostrar nombres en pantalla
+        document.getElementById("jugador").innerText = jugador.nombre;
+        document.getElementById("enemigo").innerText = enemigo.nombre;
+
+        // -------- UI --------
+        function actualizar() {
+            document.getElementById("vidaJ").innerText = jugador.vida;
+            document.getElementById("vidaE").innerText = enemigo.vida;
+        }
+
+        // -------- ANIMACIONES --------
+        function animar(atacante, victima) {
+            let a = document.getElementById(atacante);
+            let v = document.getElementById(victima);
+
+            a.classList.add("atacando");
+            setTimeout(() => a.classList.remove("atacando"), 200);
+
+            v.classList.add("golpe");
+            setTimeout(() => v.classList.remove("golpe"), 300);
+        }
+
+        // -------- ACCIONES --------
+        function atacar() {
+            let daño = jugador.atacar(enemigo);
+            animar("jugador", "enemigo");
+
+            log(`⚔️ ${jugador.nombre} hace ${daño} de daño`);
+
+            turnoEnemigo();
+            actualizar();
+            verificar();
+        }
+
+        function defender() {
+            jugador.defender();
+            log(`🛡️ ${jugador.nombre} se defiende`);
+
+            turnoEnemigo();
+        }
+
+        function poder() {
+            let daño = jugador.ataque * 2;
+            enemigo.vida -= daño;
+
+            animar("jugador", "enemigo");
+            log(`💥 ${jugador.nombre} usa poder y hace ${daño}`);
+
+            turnoEnemigo();
+            actualizar();
+            verificar();
+        }
+
+        // -------- ENEMIGO --------
+        function turnoEnemigo() {
+            if (enemigo.vida <= 0) return;
+
+            setTimeout(() => {
+                let accion = Math.floor(Math.random() * 3);
+
+                if (accion === 0) {
+                    let daño = enemigo.atacar(jugador);
+                    animar("enemigo", "jugador");
+                    log(`👾 ${enemigo.nombre} ataca: ${daño}`);
+                }
+
+                else if (accion === 1) {
+                    enemigo.defender();
+                    log(`🛡️ ${enemigo.nombre} se defiende`);
+                }
+
+                else {
+                    let daño = enemigo.ataque * 2;
+                    jugador.vida -= daño;
+
+                    animar("enemigo", "jugador");
+                    log(`💥 ${enemigo.nombre} usa poder: ${daño}`);
+                }
+
+                actualizar();
+                verificar();
+
+            }, 500);
+        }
+
+        // -------- LOG --------
+        function log(texto) {
+            document.getElementById("log").innerHTML += "<p>" + texto + "</p>";
+        }
+
+        // -------- FINAL --------
+        function verificar() {
+            if (jugador.vida <= 0) {
+                alert(" Perdiste");
+            }
+            if (enemigo.vida <= 0) {
+                alert(" Ganaste");
+            }
+        }
+
+        actualizar();
+
+    </script>
+
+</body>
+
+</html>
