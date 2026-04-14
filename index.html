@@ -7,21 +7,10 @@
 
     <style>
         body {
-            body {
-    background-image: url("./img/fondo1.jpg");
-    background-size: cover;
-    background-position: center;
-}
-
-#jugador {
-    background-image: url("./img/luffy.png");
-}
-
-#enemigo {
-    background-image: url("./img/enel.png");
-}
-            background-repeat: no-repeat;
+            background-image: url("img/fondo1.jpg");
             background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             background-attachment: fixed;
             color: white;
             font-family: Arial;
@@ -31,62 +20,32 @@
         .escena {
             display: flex;
             justify-content: space-around;
-            margin-top: 350px;
+            margin-top: 200px;
         }
 
         .personaje {
             background-image: url("img/luffy.png");
-            background-position: cover;
             background-repeat: no-repeat;
-            background-size: 100px;
+            background-size: contain;
+            background-position: center;
             width: 140px;
             height: 140px;
-            color: white;
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            transition: transform 0.2s;
         }
 
         .personaje1 {
             background-image: url("img/enel.png");
-            background-position: cover;
             background-repeat: no-repeat;
-            background-size: 180px;
+            background-size: contain;
+            background-position: center;
             width: 140px;
             height: 140px;
-            color: white;
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        }
+
+        #vidaE, #vidaJ {
+            margin-top: 20px;
             font-weight: bold;
-            transition: transform 0.2s;
-            margin-left: 0;
-        }
-
-        #jugador {
-            margin-top: 150px;
-            margin-right: 35px;
-        }
-
-        #enemigo {
-            margin-top: 150px;
-            margin-left: 60px;
-        }
-
-
-        #vidaE {
-            margin-top: 30px;
-            margin-left: 60px;
-        }
-
-
-        #vidaJ {
-            margin-top: 30px;
-            margin-right: 30px;
         }
 
         .atacando {
@@ -98,25 +57,11 @@
         }
 
         @keyframes shake {
-            0% {
-                transform: translateX(0);
-            }
-
-            25% {
-                transform: translateX(-10px);
-            }
-
-            50% {
-                transform: translateX(10px);
-            }
-
-            75% {
-                transform: translateX(-10px);
-            }
-
-            100% {
-                transform: translateX(0);
-            }
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
         }
 
         button {
@@ -139,24 +84,13 @@
 
     <div class="escena">
         <div>
-            <div id="jugadores" class="personaje">
-                <div id="jugador">
-                    <p id="xd">Jugador</p>
-                </div>
-            </div>
+            <div id="jugador" class="personaje"></div>
             <div id="vidaJ">100</div>
-
-            <!-- <span id="vidaJ">100</span> -->
         </div>
 
         <div>
-            <div id="enemigos" class="personaje1">
-                <div id="enemigo">
-                </div>
-
-            </div>
+            <div id="enemigo" class="personaje1"></div>
             <div id="vidaE">100</div>
-            <!-- <span id="vidaE">100</span> -->
         </div>
     </div>
 
@@ -169,8 +103,6 @@
     <div id="log"></div>
 
     <script>
-
-        // -------- CLASE --------
         class Personaje {
             constructor(nombre, vida, ataque) {
                 this.nombre = nombre;
@@ -196,25 +128,17 @@
             }
         }
 
-        // -------- PEDIR NOMBRES --------
-        let nombreJugador = prompt(" Escribe el nombre de tu personaje:");
-        let nombreEnemigo = prompt(" Escribe el nombre del enemigo:");
+        let nombreJugador = prompt("Nombre del jugador:");
+        let nombreEnemigo = prompt("Nombre del enemigo:");
 
-        // -------- CREAR PERSONAJES --------
         let jugador = new Personaje(nombreJugador, 100, 20);
         let enemigo = new Personaje(nombreEnemigo, 100, 15);
 
-        // Mostrar nombres en pantalla
-        document.getElementById("jugador").innerText = jugador.nombre;
-        document.getElementById("enemigo").innerText = enemigo.nombre;
-
-        // -------- UI --------
         function actualizar() {
             document.getElementById("vidaJ").innerText = jugador.vida;
             document.getElementById("vidaE").innerText = enemigo.vida;
         }
 
-        // -------- ANIMACIONES --------
         function animar(atacante, victima) {
             let a = document.getElementById(atacante);
             let v = document.getElementById(victima);
@@ -226,12 +150,11 @@
             setTimeout(() => v.classList.remove("golpe"), 300);
         }
 
-        // -------- ACCIONES --------
         function atacar() {
             let daño = jugador.atacar(enemigo);
             animar("jugador", "enemigo");
 
-            log(`⚔️ ${jugador.nombre} hace ${daño} de daño`);
+            log(`⚔️ ${jugador.nombre} hace ${daño}`);
 
             turnoEnemigo();
             actualizar();
@@ -250,14 +173,13 @@
             enemigo.vida -= daño;
 
             animar("jugador", "enemigo");
-            log(`💥 ${jugador.nombre} usa poder y hace ${daño}`);
+            log(`💥 ${jugador.nombre} hace ${daño}`);
 
             turnoEnemigo();
             actualizar();
             verificar();
         }
 
-        // -------- ENEMIGO --------
         function turnoEnemigo() {
             if (enemigo.vida <= 0) return;
 
@@ -267,47 +189,34 @@
                 if (accion === 0) {
                     let daño = enemigo.atacar(jugador);
                     animar("enemigo", "jugador");
-                    log(`👾 ${enemigo.nombre} ataca: ${daño}`);
-                }
-
-                else if (accion === 1) {
+                    log(`👾 ${enemigo.nombre} ataca ${daño}`);
+                } else if (accion === 1) {
                     enemigo.defender();
                     log(`🛡️ ${enemigo.nombre} se defiende`);
-                }
-
-                else {
+                } else {
                     let daño = enemigo.ataque * 2;
                     jugador.vida -= daño;
 
                     animar("enemigo", "jugador");
-                    log(`💥 ${enemigo.nombre} usa poder: ${daño}`);
+                    log(`💥 ${enemigo.nombre} hace ${daño}`);
                 }
 
                 actualizar();
                 verificar();
-
             }, 500);
         }
 
-        // -------- LOG --------
         function log(texto) {
             document.getElementById("log").innerHTML += "<p>" + texto + "</p>";
         }
 
-        // -------- FINAL --------
         function verificar() {
-            if (jugador.vida <= 0) {
-                alert(" Perdiste");
-            }
-            if (enemigo.vida <= 0) {
-                alert(" Ganaste");
-            }
+            if (jugador.vida <= 0) alert("Perdiste");
+            if (enemigo.vida <= 0) alert("Ganaste");
         }
 
         actualizar();
-
     </script>
 
 </body>
-
 </html>
